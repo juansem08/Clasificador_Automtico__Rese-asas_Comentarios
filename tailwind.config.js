@@ -1,69 +1,49 @@
+/*
+ * Sistema de diseño por tokens: cada color es una variable CSS (definida en src/index.css)
+ * con un valor para tema claro y otro para oscuro. Los componentes usan solo estos tokens.
+ */
+const c = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  darkMode: "class",
+  darkMode: 'class',
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
-        // Paleta del sistema de diseño Stitch (ReviewScope / ReviewClassifier AI)
-        surface: '#051424',
-        'surface-dim': '#051424',
-        'surface-bright': '#2c3a4c',
-        'surface-container-lowest': '#010f1f',
-        'surface-container-low': '#0d1c2d',
-        'surface-container': '#122131',
-        'surface-container-high': '#1c2b3c',
-        'surface-container-highest': '#273647',
-        'on-surface': '#d4e4fa',
-        'on-surface-variant': '#d8c3ad',
-        'inverse-surface': '#d4e4fa',
-        'inverse-on-surface': '#233143',
-        outline: '#a08e7a',
-        'outline-variant': '#534434',
-        primary: '#f59e0b',
-        'primary-container': '#f59e0b',
-        'on-primary': '#472a00',
-        'on-primary-container': '#613b00',
-        'primary-fixed-dim': '#ffb95f',
-        'on-primary-fixed-variant': '#653e00',
-        secondary: '#10b981',
-        'secondary-container': '#059669',
-        tertiary: '#ffbbbe',
-        'tertiary-container': '#ff919a',
-        error: '#f43f5e',
-        'error-container': '#93000a',
-        // Slates tradicionales
-        slate: {
-          850: '#151f32',
-          950: '#070b14',
-        },
-      },
-      spacing: {
-        'space-xs': '0.25rem',
-        'space-sm': '0.5rem',
-        'space-md': '0.75rem',
-        'space-lg': '1.25rem',
-        'space-xl': '2rem',
+        canvas: c('canvas'),
+        surface: c('surface'),
+        sunken: c('sunken'),
+        muted: c('muted'),
+        line: { DEFAULT: c('line'), strong: c('line-strong') },
+        ink: { DEFAULT: c('ink'), 2: c('ink-2'), 3: c('ink-3') },
+        accent: { DEFAULT: c('accent'), hover: c('accent-hover'), soft: c('accent-soft'), ink: c('accent-ink') },
+        'on-accent': c('on-accent'),
+        inverse: { DEFAULT: c('inverse'), line: c('inverse-line') },
+        'on-inverse': c('on-inverse'),
+        night: c('night'),
+        'on-night': c('on-night'),
+        tape: c('tape'),
+        'on-tape': c('on-tape'),
+        pos: { DEFAULT: c('pos'), soft: c('pos-soft'), ink: c('pos-ink') },
+        neu: { DEFAULT: c('neu'), soft: c('neu-soft'), ink: c('neu-ink') },
+        neg: { DEFAULT: c('neg'), soft: c('neg-soft'), ink: c('neg-ink') },
+        warn: { soft: c('warn-soft'), ink: c('warn-ink'), line: c('warn-line') },
+        alta: { DEFAULT: c('alta'), ink: c('alta-ink') },
+        danger: c('danger'),
+        success: c('success'),
       },
       fontFamily: {
-        sans: ['Hanken Grotesk', 'Inter', 'system-ui', 'sans-serif'],
-        headline: ['Newsreader', 'serif'],
-        mono: ['JetBrains Mono', 'monospace'],
-        code: ['JetBrains Mono', 'monospace'],
+        // El navegador usa la segunda fuente para los caracteres que la primera no tiene (cirílico)
+        sans: ['"Figtree Variable"', '"Onest Variable"', '"Segoe UI"', 'system-ui', 'sans-serif'],
+        display: ['"Newsreader Variable"', '"Literata Variable"', 'Georgia', '"Times New Roman"', 'serif'],
       },
-      animation: {
-        'pulse-subtle': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'fade-in': 'fadeIn 0.3s ease-out forwards',
+      borderRadius: {
+        '4xl': '28px',
       },
-      keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0', transform: 'translateY(6px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        }
-      }
+      boxShadow: {
+        soft: '0 1px 2px rgb(31 26 23 / 0.04), 0 8px 24px -12px rgb(31 26 23 / 0.10)',
+      },
     },
   },
   plugins: [],
