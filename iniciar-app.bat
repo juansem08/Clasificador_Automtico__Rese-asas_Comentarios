@@ -1,8 +1,10 @@
 @echo off
-title ReviewClassifier AI - Desktop Studio
-echo ========================================================
-echo   Iniciando ReviewClassifier AI Desktop Studio (Electron)
-echo ========================================================
+title Clasificador de Resenas IA
 cd /d "%~dp0"
-call npm run dev:electron
+if not exist node_modules (
+  echo Instalando dependencias por primera vez...
+  call npm install
+)
+echo Iniciando Clasificador de Resenas IA...
+call npm run dev
 pause
