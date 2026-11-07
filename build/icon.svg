@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d9832a"/>
+      <stop offset="1" stop-color="#9a4c06"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- Fondo: cuadrado redondeado naranja tostado -->
+  <rect x="64" y="64" width="896" height="896" rx="210" fill="url(#bg)"/>
+  <rect x="64" y="64" width="896" height="896" rx="210" fill="url(#shine)"/>
+  <!-- Destello principal (la IA) -->
+  <path d="M480 200 C 508 420, 568 480, 790 512 C 568 544, 508 604, 480 824 C 452 604, 392 544, 170 512 C 392 480, 452 420, 480 200 Z" fill="#fbf3ea"/>
+  <!-- Destello pequeño y punto (color arena) -->
+  <path d="M752 196 C 762 262, 778 278, 844 288 C 778 298, 762 314, 752 380 C 742 314, 726 298, 660 288 C 726 278, 742 262, 752 196 Z" fill="#f3c88f"/>
+  <circle cx="770" cy="760" r="44" fill="#f3c88f"/>
+</svg>
