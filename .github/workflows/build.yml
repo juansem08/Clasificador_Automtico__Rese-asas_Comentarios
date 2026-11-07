@@ -1,0 +1,77 @@
+# Genera los instaladores para Windows, macOS y Linux en las máquinas de GitHub.
+#
+# - Manual: pestaña "Actions" → "Instaladores" → "Run workflow". Los archivos quedan en "Artifacts".
+# - Versión: al subir una etiqueta (git tag v1.0.0 && git push --tags) además se crea una "Release"
+#   con los instaladores adjuntos, lista para descargar.
+name: Instaladores
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            os: windows-latest
+            target: --win --x64
+          - name: macOS
+            os: macos-latest
+            target: --mac
+          - name: Linux
+            os: ubuntu-latest
+            target: --linux
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar
+        run: npm run build
+
+      - name: Empaquetar
+        run: npx electron-builder ${{ matrix.target }} --publish never
+        env:
+          # Sin certificado de firma: se generan instaladores sin firmar
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Subir instaladores
+        uses: actions/upload-artifact@v4
+        with:
+          name: instaladores-${{ matrix.name }}
+          path: |
+            release/*.exe
+            release/*.dmg
+            release/*.AppImage
+            release/*.deb
+          if-no-files-found: error
+
+  release:
+    name: Publicar versión
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: instaladores
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: instaladores/*
