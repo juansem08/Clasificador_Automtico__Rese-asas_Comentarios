@@ -1,60 +1,120 @@
 {
-  "name": "app-escritorio",
+  "name": "clasificador-resenas",
+  "productName": "Clasificador de Reseñas IA",
+  "description": "Clasificador automático de reseñas y comentarios con análisis de IA (Gemini)",
+  "author": "juansem08",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "main": "dist-electron/main.cjs",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "typecheck": "tsc -b",
-    "build:electron-main": "esbuild electron/main.ts --bundle --platform=node --outfile=dist-electron/main.cjs --external:electron && esbuild electron/preload.ts --bundle --platform=node --outfile=dist-electron/preload.cjs --external:electron",
-    "dev:electron": "concurrently -k \"npm run dev\" \"wait-on tcp:5173 && npm run build:electron-main && cross-env NODE_ENV=development electron .\"",
-    "build:electron": "npm run build && npm run build:electron-main && electron-builder",
-    "lint": "oxlint",
-    "preview": "vite preview"
+    "dev": "concurrently -k -n vite,electron -c cyan,magenta \"vite\" \"wait-on tcp:5173 && npm run build:electron && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 node scripts/run-electron.cjs\"",
+    "build:electron": "esbuild electron/main.ts --bundle --platform=node --format=cjs --packages=external --outfile=dist-electron/main.cjs && esbuild electron/preload.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist-electron/preload.cjs",
+    "build": "tsc --noEmit && vite build && npm run build:electron",
+    "start": "npm run build && node scripts/run-electron.cjs",
+    "typecheck": "tsc --noEmit",
+    "icon": "node scripts/run-electron.cjs scripts/make-icon.cjs",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win --x64",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:linux": "npm run build && electron-builder --linux"
   },
   "build": {
-    "appId": "com.reviewclassifier.desktop",
-    "productName": "ReviewClassifier AI",
+    "appId": "com.clasificador.resenas",
+    "productName": "Clasificador de Reseñas IA",
+    "copyright": "© 2026 juansem08",
     "directories": {
-      "output": "release"
+      "output": "release",
+      "buildResources": "build"
     },
     "files": [
       "dist/**/*",
-      "dist-electron/**/*"
+      "dist-electron/**/*",
+      "package.json"
     ],
     "win": {
+      "icon": "build/icon.png",
       "target": [
         "nsis",
         "portable"
       ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Clasificador de Reseñas IA",
+      "uninstallDisplayName": "Clasificador de Reseñas IA",
+      "installerLanguages": [
+        "es_ES",
+        "en_US",
+        "ru_RU"
+      ],
+      "multiLanguageInstaller": true,
+      "artifactName": "Clasificador-Resenas-IA-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Clasificador-Resenas-IA-${version}-portable.${ext}"
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "artifactName": "Clasificador-Resenas-IA-${version}-mac-${arch}.${ext}"
+    },
+    "dmg": {
+      "title": "Clasificador de Reseñas IA"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Office",
+      "executableName": "clasificador-resenas",
+      "synopsis": "Clasificador de reseñas con IA (Gemini)",
+      "maintainer": "juansem08 <juansem08@users.noreply.github.com>",
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "artifactName": "Clasificador-Resenas-IA-${version}-linux-${arch}.${ext}"
     }
   },
   "dependencies": {
     "@google/genai": "^2.23.0",
-    "@types/papaparse": "^5.5.2",
-    "autoprefixer": "^10.6.1",
-    "clsx": "^2.1.1",
-    "lucide-react": "^1.47.0",
-    "papaparse": "^5.7.0",
-    "postcss": "^8.5.28",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "tailwind-merge": "^3.7.0",
-    "tailwindcss": "^3.4.19"
+    "exceljs": "^4.4.0",
+    "jszip": "^3.10.2"
   },
   "devDependencies": {
+    "@fontsource-variable/figtree": "^5.3.0",
+    "@fontsource-variable/literata": "^5.3.0",
+    "@fontsource-variable/newsreader": "^5.3.0",
+    "@fontsource-variable/onest": "^5.3.1",
     "@types/node": "^24.13.3",
+    "@types/papaparse": "^5.5.2",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
+    "autoprefixer": "^10.6.1",
     "concurrently": "^10.0.5",
     "cross-env": "^10.1.0",
     "electron": "^44.6.0",
     "electron-builder": "^26.15.3",
     "esbuild": "^0.28.2",
-    "oxlint": "^1.81.0",
+    "lucide-react": "^1.47.0",
+    "papaparse": "^5.7.0",
+    "postcss": "^8.5.28",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwindcss": "^3.4.19",
     "typescript": "~6.0.2",
     "vite": "^8.3.0",
     "wait-on": "^9.5.1"
