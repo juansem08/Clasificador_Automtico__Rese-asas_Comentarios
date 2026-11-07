@@ -1,101 +1,121 @@
-import React, { useState, useEffect } from 'react';
-import { Key, X } from 'lucide-react';
+import { ExternalLink, Eye, EyeOff, KeyRound, LoaderCircle, Trash2, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Rich, useI18n } from '../i18n/I18n';
+import { useStore } from '../state/store';
 
-interface ApiKeyModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave?: (savedKey: string) => void;
-}
+export default function ApiKeyModal() {
+  const { settings, setShowKeyModal, refreshSettings, refreshModels, setNotice } = useStore();
+  const { t, error: errText } = useI18n();
+  const [key, setKey] = useState('');
+  const [show, setShow] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
-export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
-  isOpen,
-  onClose,
-  onSave,
-}) => {
-  // 1. Estado apiKey en el componente para gestionar el valor del input
-  const [apiKey, setApiKey] = useState<string>('');
+  const canClose = settings.hasKey && !saving;
+  const close = () => setShowKeyModal(false);
 
-  // 1. useEffect: al montar el componente (y al abrirse), lee si ya existe una llave guardada en localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('gemini_api_key');
-    if (saved) {
-      setApiKey(saved);
-    }
-  }, []);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && canClose) setShowKeyModal(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [canClose, setShowKeyModal]);
 
-  // Sincronizar si cambia el estado de apertura
-  useEffect(() => {
-    if (isOpen) {
-      const savedKey = localStorage.getItem('gemini_api_key') || '';
-      setApiKey(savedKey);
-    }
-  }, [isOpen]);
+  const save = async () => {
+    if (!key.trim() || saving) return;
+    setSaving(true);
+    setError('');
+    const res = await window.api.setApiKey(key);
+    setSaving(false);
+    if (!res.ok) return setError(errText(res));
+    await refreshModels();
+    close();
+    setNotice({ kind: 'success', text: t('apiKey.saved') });
+  };
 
-  if (!isOpen) return null;
-
-  // 3. Acción de Guardar y Cerrar
-  const handleSaveAndClose = () => {
-    const trimmedKey = apiKey.trim();
-    // Guardar en localStorage
-    localStorage.setItem('gemini_api_key', trimmedKey);
-    // Actualizar estado padre/global si se proporciona callback
-    if (onSave) {
-      onSave(trimmedKey);
-    }
-    // Cerrar el modal
-    onClose();
+  const clear = async () => {
+    await window.api.clearApiKey();
+    setKey('');
+    await refreshSettings();
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 flex flex-col gap-4 animate-fade-in">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center">
-              <Key className="w-4 h-4" />
-            </div>
-            <h3 className="font-bold text-sm text-slate-900">Gemini API Key</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-night/50 p-4 backdrop-blur-sm">
+      <div className="card w-full max-w-md p-8 shadow-soft">
+        <div className="mb-6 flex items-start justify-between">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-soft text-accent-ink">
+            <KeyRound size={22} />
+          </span>
+          {canClose && (
+            <button className="btn-icon" onClick={close} aria-label={t('common.close')}>
+              <X size={18} />
+            </button>
+          )}
+        </div>
+        <h2 className="display text-4xl">
+          <Rich text={t('apiKey.title')} />
+        </h2>
+        <p className="mt-2 text-sm text-ink-2">{t('apiKey.subtitle')}</p>
+
+        {settings.hasKey && (
+          <div className="mt-5 flex items-center justify-between rounded-2xl bg-sunken px-4 py-2.5 text-sm">
+            <span>
+              {t('apiKey.current')} <span className="font-mono">{settings.maskedKey}</span>
+            </span>
+            <button className="flex items-center gap-1 font-semibold text-danger hover:underline" onClick={clear}>
+              <Trash2 size={14} /> {t('common.delete')}
+            </button>
           </div>
+        )}
+
+        <label className="eyebrow mb-1.5 mt-5 block" htmlFor="api-key">
+          {settings.hasKey ? t('apiKey.replace') : t('apiKey.paste')}
+        </label>
+        <div className="relative">
+          <input
+            id="api-key"
+            className="input pr-12 font-mono"
+            type={show ? 'text' : 'password'}
+            placeholder="AIza..."
+            value={key}
+            autoFocus
+            onChange={(e) => setKey(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && void save()}
+          />
           <button
+            className="btn-icon absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2"
+            onClick={() => setShow((s) => !s)}
+            aria-label={show ? t('apiKey.hide') : t('apiKey.show')}
             type="button"
-            onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 cursor-pointer"
           >
-            <X className="w-4 h-4" />
+            {show ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </div>
-        <p className="text-xs text-slate-500 leading-relaxed">
-          Introduce tu API Key de Google AI Studio para activar la inferencia de Gemini 2.5 Flash. Se guarda automáticamente en tu navegador.
-        </p>
-        
-        {/* 2. Manejo del Input: conectado a onChange para actualizar apiKey mientras escribe */}
-        <input
-          type="password"
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleSaveAndClose();
-            }
-          }}
-          placeholder="AIzaSy..."
-          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
-        />
 
-        <div className="flex justify-end gap-2 pt-2">
-          {/* 3. Botón "Guardar y Cerrar" que persiste en localStorage, actualiza estado y cierra */}
-          <button
-            type="button"
-            onClick={handleSaveAndClose}
-            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all cursor-pointer shadow-sm"
-          >
-            Guardar y Cerrar
+        {error && <p className="mt-3 rounded-2xl bg-neg-soft px-4 py-2.5 text-sm font-medium text-neg-ink">{error}</p>}
+
+        <a
+          className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent-ink hover:underline"
+          href="https://aistudio.google.com/apikey"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {t('apiKey.getFree')} <ExternalLink size={13} />
+        </a>
+
+        <div className="mt-7 flex justify-end gap-2">
+          {canClose && (
+            <button className="btn-outline" onClick={close}>
+              {t('common.cancel')}
+            </button>
+          )}
+          <button className="btn-primary" onClick={save} disabled={!key.trim() || saving}>
+            {saving && <LoaderCircle size={16} className="animate-spin" />}
+            {saving ? t('apiKey.verifying') : t('apiKey.saveVerify')}
           </button>
         </div>
       </div>
     </div>
   );
-};
-
-export default ApiKeyModal;
+}
