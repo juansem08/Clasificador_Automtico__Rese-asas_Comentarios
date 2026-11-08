@@ -9,7 +9,7 @@
   "main": "dist-electron/main.cjs",
   "scripts": {
     "dev": "concurrently -k -n vite,electron -c cyan,magenta \"vite\" \"wait-on tcp:5173 && npm run build:electron && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 node scripts/run-electron.cjs\"",
-    "build:electron": "esbuild electron/main.ts --bundle --platform=node --format=cjs --packages=external --outfile=dist-electron/main.cjs && esbuild electron/preload.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist-electron/preload.cjs",
+    "build:electron": "node scripts/build-electron.cjs",
     "build": "tsc --noEmit && vite build && npm run build:electron",
     "start": "npm run build && node scripts/run-electron.cjs",
     "typecheck": "tsc --noEmit",

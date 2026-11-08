@@ -63,6 +63,16 @@ Cada sistema solo puede empaquetar sus propios instaladores, así que la forma m
 | **macOS** | `…-mac-arm64.dmg` (M1/M2/M3/M4) y `…-mac-x64.dmg` (Intel) | Arrastra la app a *Aplicaciones*; la primera vez, **clic derecho → Abrir**. Si dice que "está dañada": `xattr -cr "/Applications/Clasificador de Reseñas IA.app"` |
 | **Linux** | `…-linux-x86_64.AppImage` y `…-linux-amd64.deb` | AppImage: `chmod +x` y doble clic. Debian/Ubuntu: `sudo apt install ./archivo.deb` |
 
+### Instalador con la API key incluida (opcional)
+
+Para entregar la app lista para usar, sin que haya que pegar la clave, crea en la raíz del proyecto un archivo `.env.local` con:
+
+```
+GEMINI_API_KEY=tu_clave
+```
+
+y genera el instalador en tu equipo (`npm run dist:win`). La clave queda dentro de ese instalador y se usa siempre que el usuario no haya guardado una propia (la que pegue en la app tiene prioridad). `.env.local` está en `.gitignore`, así que nunca se sube a GitHub, y los instaladores de GitHub Actions salen sin clave. **Comparte ese instalador solo de forma privada**: la clave puede extraerse del archivo, así que conviene revocarla en Google AI Studio cuando ya no se necesite.
+
 La configuración (API key cifrada, idioma, tema) y el historial se guardan en la carpeta de datos de usuario de cada sistema (`%APPDATA%`, `~/Library/Application Support` o `~/.config`).
 
 ## Estructura

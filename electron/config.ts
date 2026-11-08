@@ -35,14 +35,19 @@ export async function updateConfig(patch: Partial<StoredConfig>): Promise<void> 
   await fs.writeFile(configPath(), JSON.stringify(next, null, 2), 'utf8');
 }
 
+/** Clave incrustada al compilar desde .env.local (vacía si no se incluyó). La define scripts/build-electron.cjs. */
+declare const __BUNDLED_API_KEY__: string;
+const bundledKey = typeof __BUNDLED_API_KEY__ === 'string' ? __BUNDLED_API_KEY__ : '';
+
+/** Clave guardada por el usuario en este equipo; si no hay, la incluida en el instalador. */
 export async function getApiKey(): Promise<string | undefined> {
   const config = await readConfig();
-  if (!config.apiKey) return undefined;
+  if (!config.apiKey) return bundledKey || undefined;
   if (!config.encrypted) return config.apiKey;
   try {
     return safeStorage.decryptString(Buffer.from(config.apiKey, 'base64'));
   } catch {
-    return undefined;
+    return bundledKey || undefined;
   }
 }
 
