@@ -12,6 +12,31 @@ Aplicación de escritorio (Electron + React) que carga opiniones de clientes des
 | **Motivo**        | Frase que explica por qué se clasificó así                  |
 | **Respuesta**     | Respuesta sugerida al cliente (opcional, generada con IA)   |
 
+## Descargar e instalar
+
+**[⬇️ Descargar la última versión](https://github.com/juansem08/Clasificador_Automtico__Rese-asas_Comentarios/releases/latest)**: no hace falta instalar Node.js ni nada más.
+
+### Windows
+
+| Archivo | Para qué sirve |
+| ------- | -------------- |
+| [**Clasificador-Resenas-IA-Setup-1.0.0.exe**](https://github.com/juansem08/Clasificador_Automtico__Rese-asas_Comentarios/releases/latest/download/Clasificador-Resenas-IA-Setup-1.0.0.exe) | **Instalador** (recomendado): crea accesos directos en el escritorio y el menú Inicio |
+| [Clasificador-Resenas-IA-1.0.0-portable.exe](https://github.com/juansem08/Clasificador_Automtico__Rese-asas_Comentarios/releases/latest/download/Clasificador-Resenas-IA-1.0.0-portable.exe) | **Portable**: se abre directamente, sin instalar (útil en un USB o sin permisos de administrador) |
+
+Pasos:
+
+1. Descarga `Clasificador-Resenas-IA-Setup-1.0.0.exe`.
+2. Ábrelo. Si aparece **"Windows protegió su PC"** (la app no tiene firma digital), pulsa **Más información → Ejecutar de todas formas**.
+3. Elige la carpeta de instalación y pulsa **Instalar**.
+4. Abre **Clasificador de Reseñas IA** desde el escritorio o el menú Inicio.
+5. La primera vez, pega tu **API key de Gemini** (gratis en [Google AI Studio](https://aistudio.google.com/apikey)). Se guarda cifrada en el equipo.
+
+Para desinstalarla: **Configuración de Windows → Aplicaciones → Clasificador de Reseñas IA → Desinstalar**.
+
+### macOS y Linux
+
+En la [página de la versión](https://github.com/juansem08/Clasificador_Automtico__Rese-asas_Comentarios/releases/latest) también están el `.dmg` (Mac con Apple Silicon o Intel) y el `.AppImage` / `.deb` (Linux). Las instrucciones de la primera apertura están en [Instaladores para Windows, macOS y Linux](#instaladores-para-windows-macos-y-linux).
+
 ## Funciones
 
 - **Cargar datos**: CSV, `.xlsx`, `.txt` o lista pegada; detecta la columna de texto y la de fecha. **Limpieza previa**: las opiniones vacías se omiten y las duplicadas heredan la clasificación de la original (ahorra consultas a la API).
